@@ -11,15 +11,13 @@
       </div>
     </div>
     <p class="app-info">定期を購入した際に、<br>何回利用すればお得になるか計算します</p>
-    <p class="URL">
-      <a href="https://www.navitime.co.jp/transfer/pass/" target="_blank">定期代検索</a>
-      <a href="https://ekitan.com/transit/pass" target="_blank">新幹線・特急の定期代検索</a>
-    </p>
     <div class="form-group">
+      <p class="info1">1.定期の金額と期間を入力してください</p>
       <label for="textbox1">定期代:</label>
       <input type="text" v-model="定期代" id="textbox1" name="textbox1">円
       <!-- 定期代のバリデーションメッセージ -->
       <p v-if="定期代エラー" class="error-message">定期代を半角数字、7桁以内で入力してください</p>
+      <p v-if="料金比較エラー" class="error-message">定期代が正しいか確認してください</p>
     </div>
     <div class="form-group">
       <label for="textbox3">期間:</label>
@@ -31,14 +29,23 @@
       </select>ヶ月
     </div>
     <p class="URL">
-      <a href="https://transit.yahoo.co.jp/" target="_blank">料金検索</a>
+      <a href="https://www.navitime.co.jp/transfer/pass/" target="_blank">定期代がわからない方はこちら</a>
+    </p>
+    <p class="URL">
+      <a href="https://ekitan.com/transit/pass" target="_blank">新幹線・特急の定期代はこちら</a>
     </p>
     <div class="form-group">
+      <p class="info2">2.同じ区間の片道運賃を入力してください</p>
       <label for="textbox2">片道運賃:</label>
       <input type="text" v-model="片道運賃" id="textbox2" name="textbox2">円
       <!-- 片道運賃のバリデーションメッセージ -->
       <p v-if="片道運賃エラー" class="error-message">片道運賃を半角数字、5桁以内で入力してください</p>
+      <p v-if="料金比較エラー" class="error-message">片道運賃が正しいか確認してください</p>
     </div>
+    <p class="URL">
+      <a href="https://transit.yahoo.co.jp/" target="_blank">片道運賃がわからない方はこちら</a>
+    </p>
+    <p></p>
     <!-- 答えボタンの追加 -->
     <button @click="calculate">計算</button>
     <!-- 計算結果の表示 -->
@@ -67,14 +74,16 @@ export default {
       往復運賃: null,
       定期代エラー: false,
       片道運賃エラー: false,
+      料金比較エラー: false,
     };
   },
   methods: {
     calculate() {
       this.定期代エラー = !this.isValidInput(this.定期代)  || this.定期代.length > 7 || this.定期代 === '0' || this.定期代 === '00' || this.定期代 === '000' || this.定期代 === '0000' || this.定期代 === '00000' || this.定期代 === '000000' || this.定期代 === '0000000';
       this.片道運賃エラー = !this.isValidInput(this.片道運賃) || this.片道運賃.length > 5 || this.片道運賃 === '0' || this.片道運賃 === '00' || this.片道運賃 === '000' || this.片道運賃 === '0000' || this.片道運賃 === '00000';
+      this.料金比較エラー = this.片道運賃*4 > this.定期代;
 
-      if (this.定期代エラー || this.片道運賃エラー) {
+      if (this.定期代エラー || this.片道運賃エラー || this.料金比較エラー) {
         // 入力が無効な場合、計算を中止
         return;
       }
@@ -123,7 +132,23 @@ font-size: 1.5rem;
   text-align: center;
 }
 
+.info1 {
+  margin-top: 2rem;
+  margin-bottom: 0.8rem;
+  font-weight: bold;
+  font-size: 20px;
+}
+
+.info2 {
+  margin-top: 2rem;
+  margin-bottom: 0.8rem;
+  font-weight: bold;
+  font-size: 20px;
+}
+
 .URL a {
+  margin-top: 10px;
+  margin-bottom: 10px;
   display: inline-block;
   margin-right: 10px; /* リンク間の隙間を10pxに設定（必要に応じて調整） */
 }
@@ -164,12 +189,14 @@ input[type="text"] {
 
 button {
   display: block;
+  width: 100%; /* 横幅100% */
   background-color: #B1D8A8;
   color: white;
-  padding: 10px;
+  padding: 15px; /* 大きめのパディング */
   border: none;
   border-radius: 5px;
   cursor: pointer;
+  font-size: 1.2rem; /* 大きなフォントサイズ */
   font-weight: bold;
   margin: auto;
   text-shadow:
@@ -177,8 +204,14 @@ button {
     1px -1px 0 #5151516D,
     -1px 1px 0 #5151516D,
     1px 1px 0 #5151516D; /* テキストに輪郭線を追加 */
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* タイトルの影 */
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* ボタンの影 */
 }
+
+/* ボタンのホバー時のスタイル */
+button:hover {
+  background-color: #94CFA3; /* ホバー時の背景色の変更 */
+}
+
 
 .answers {
   font-weight: bold;
